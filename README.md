@@ -10,13 +10,13 @@ The config file formats can be either [CSON](https://github.com/bevry/cson) or J
 
 Just require and tell confurg what your project is called:
 
-    config = require("confurg")({ namespace: "myproject" })
+    config = require("confurg").init "myproject"
 
 In this example, confurg will check the follow locations in decreasing order of value:
 
     1. Command line options such as --bar=baz
-    3. ENV variables prefaced with myproject_ 
-    2. /home/{user}/.myproject.cson
+    2. ENV variables prefaced with myproject_ 
+    3. /home/{user}/.myproject.cson
     4. ./config.cson, based on the location of the script that required confurg
     5. Defaults passed into initialization: require("confurg")({ ... },{ defaults: "go here" })
 
