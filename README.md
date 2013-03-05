@@ -12,7 +12,7 @@ Just require and tell confurg what your project is called:
 
     config = require("confurg").init "myproject"
 
-In this example, confurg will check the follow locations in decreasing order of value:
+In this example, confurg will check the following locations in decreasing order of value:
 
     1. Command line options such as --bar=baz
     2. ENV variables prefaced with myproject_ 
