@@ -2,7 +2,7 @@
    "name":"confurg",
    "description":"Coffeescript and Javascript configuration loader",
    "author":"Awnist <hi@awnist.com> (http://awnist.com)",
-   "version":"1.0.1",
+   "version":"1.0.2",
    "main":"./lib/confurg",
    "repository":{
       "type":"git",
@@ -16,5 +16,12 @@
       "cson": "1.4.x",
       "optimist": "0.3.x",
       "tea-merge": "0.1.x"
-   }
+   },
+   "devDependencies": {
+      "coffee-script": "1.4.x"
+   },
+   "scripts": {
+     "prepublish": "coffee -o lib/ -c src/"
+   },
+   "keywords": ["config", "env", "optimist", "cson", "json"]
 }

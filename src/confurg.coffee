@@ -1,7 +1,7 @@
 # This module handles configuration chaining.
 #
 # In decreasing order of precedence:
-# 	command line options > ~/.project.cson > ENV variables > ./config.json > defaults
+# 	command line options > ENV variables > ~/.project.cson > ./config.json > defaults
 
 fs = require 'fs'
 path = require 'path'
@@ -18,36 +18,42 @@ confurgFile = (file) ->
 		if fs.existsSync file+"."+e
 			return cson.parseFileSync file+"."+e
 
-confurg = module.exports = (settings={}, defaults={}) ->
-	throw "Need namespace config parameter" unless settings.namespace?.match /^\w+$/
+confurg = module.exports =
 
-	# default_settings =
-	#	merge: true
-	#	deep: true
+	init: (settings={}, defaults={}) ->
 
-	# Find env variables that match our namespace
-	re = new RegExp "^#{settings.namespace}_(\\w+)"
-	envs = {}
-	envs[matched] = val for key, val of process.env when matched = key.match(re)?[1]
+		# Shorthand mode
+		settings = { namespace: settings } if typeof settings is "string"
 
-	merged = {}
+		throw "Need namespace config parameter" unless settings.namespace?.match /^\w+$/
 
-	# Various config locations together based on increasing precedence
-	merge(merged, c) for c in [
-		# Defaults
-		defaults
+		# default_settings =
+		#	merge: true
+		#	deep: true
 
-		# ./config.cson
-		confurgFile path.dirname(module.parent.filename) + "/config"
+		# Find env variables that match our namespace
+		re = new RegExp "^#{settings.namespace}_(\\w+)"
+		envs = {}
+		envs[matched] = val for key, val of process.env when matched = key.match(re)?[1]
 
-		# ENV variables
-		envs
+		merged = {}
 
-		# ~/.project.cson
-		confurgFile process.env.HOME + "/.#{settings.namespace}"
+		# Various config locations together based on increasing precedence
+		merge(merged, c) for c in [
+			# Defaults
+			defaults
 
-		# Command line
-		optimist
-	] when typeof c is 'object'
+			# ./config.cson
+			confurgFile path.dirname(module.parent.filename) + "/config"
 
-	merged
+			# ~/.project.cson
+			confurgFile process.env.HOME + "/.#{settings.namespace}"
+
+			# ENV variables
+			envs
+
+			# Command line
+			optimist
+		] when typeof c is 'object'
+
+		merged
