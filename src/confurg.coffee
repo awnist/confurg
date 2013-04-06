@@ -12,11 +12,15 @@ optimist = require("optimist").argv
 # Object extensions
 merge = require 'tea-merge'
 
-# Tries to find .cson and then .json files
-confurgFile = (file) ->
-	for e in ["cson", "json"]
-		if fs.existsSync file+"."+e
-			return cson.parseFileSync file+"."+e
+# Tries to find .cson and then .json files if the initial file does not exist
+_confurg = (file) ->
+	if typeof file is "string"
+		for f in [file, "#{file}.cson", "#{file}.json"]
+			if f? and fs.existsSync(f) and fs.statSync(f).isFile()
+				return cson.parseFileSync f
+
+	else if file?
+		return file
 
 confurg = module.exports =
 
@@ -31,6 +35,9 @@ confurg = module.exports =
 		#	merge: true
 		#	deep: true
 
+		# Use custom CWD or parent's directory
+		cwd = settings?.cwd ? path.dirname(module.parent.filename)
+
 		# Find env variables that match our namespace
 		re = new RegExp "^#{settings.namespace}_(\\w+)"
 		envs = {}
@@ -38,19 +45,28 @@ confurg = module.exports =
 
 		merged = {}
 
+		# Locate configuration files
+		defaultConfigPath = "#{cwd}/config"
+		defaultHomePath = "#{process.env.HOME}/.#{settings.namespace}"	
+
+		# Confurg files and overrides
+		configConfurg = _confurg(settings?.config ? defaultConfigPath)
+		homeConfurg = _confurg(settings?.home ? defaultHomePath)
+		envConfurg = if settings?.env? then _confurg settings?.env else envs
+
 		# Various config locations together based on increasing precedence
 		merge(merged, c) for c in [
 			# Defaults
 			defaults
 
 			# ./config.cson
-			confurgFile path.dirname(module.parent.filename) + "/config"
+			configConfurg
 
 			# ~/.project.cson
-			confurgFile process.env.HOME + "/.#{settings.namespace}"
+			homeConfurg
 
 			# ENV variables
-			envs
+			envConfurg
 
 			# Command line
 			optimist
