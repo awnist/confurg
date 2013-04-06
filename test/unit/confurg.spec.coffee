@@ -1,6 +1,5 @@
 expect = require('chai').expect
 path = require 'path'
-sinon = require 'sinon'
 
 homeCson = path.resolve path.join __dirname, '../shared/cson/home'
 homeJson = path.resolve path.join __dirname, '../shared/json/home'
@@ -82,7 +81,7 @@ describe 'confurg', ->
             expect(config.envtype).to.equal type
             expect(config.env).to.equal 'override'
 
-          it 'should override the config files with new files that do not extension', ->
+          it 'should override the config files with new files that do not extensions', ->
             config = require(confurgFile).init
               namespace: 'confurg'
               home: path.join options.homePath, 'override'
