@@ -21,13 +21,13 @@ confurgFile = path.resolve path.join __dirname, '../../src/confurg.coffee'
 describe 'confurg', ->
   describe 'namespace', ->
     it 'should fail when no namespace is supplied', ->
-      fn = () ->
+      fn = ->
         require(confurgFile).init()
 
       expect(fn).to.throw()
 
     it 'should not fail when a namespace is supplied', ->
-      fn = () ->
+      fn = ->
         require(confurgFile).init 'confurg'
 
       expect(fn).to.not.throw()
