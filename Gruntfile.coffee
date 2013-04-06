@@ -1,3 +1,5 @@
+path = require 'path'
+
 exports = module.exports = (grunt) ->
 
   grunt.initConfig
@@ -7,6 +9,25 @@ exports = module.exports = (grunt) ->
         compilers: ['coffee:coffee-script']
         'ignore-leaks': true
       all: ['test/unit/*.spec.coffee']
+    clean:
+      src: ['docs']
 
   grunt.loadNpmTasks 'grunt-mocha-cli'
+  grunt.loadNpmTasks 'grunt-contrib-clean'
+
   grunt.registerTask 'test', ['mochacli']
+
+  # Generate documentation
+  grunt.registerTask 'doc', 'Generate documentation', ->
+    done = @async()
+
+    child = grunt.util.spawn {
+      cmd: path.resolve './node_modules/.bin/docco'
+      grunt: false
+      args: ['src/*.coffee']
+    }, (error, result, code) ->
+      grunt.log.ok 'Generated documentation at ./docs/'
+      done()
+
+    child.stdout.pipe process.stdout
+    child.stderr.pipe process.stderr

@@ -2,3 +2,5 @@
 Thumbs.db
 node_modules
 coverage
+npm-debug.log
+docs
