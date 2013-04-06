@@ -22,12 +22,14 @@ exports = module.exports = (grunt) ->
     done = @async()
 
     child = grunt.util.spawn {
-      cmd: path.resolve './node_modules/.bin/docco'
+      cmd: './node_modules/.bin/docco'
       grunt: false
-      args: ['src/*.coffee']
+      args: ['README.md', './src/confurg.coffee']
     }, (error, result, code) ->
       grunt.log.ok 'Generated documentation at ./docs/'
       done()
 
     child.stdout.pipe process.stdout
     child.stderr.pipe process.stderr
+
+  grunt.registerTask 'docs', ['doc']
