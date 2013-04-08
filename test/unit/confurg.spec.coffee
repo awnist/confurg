@@ -6,6 +6,7 @@ homeJson = path.resolve path.join __dirname, '../shared/json/home'
 
 projectCson = path.resolve path.join __dirname, '../shared/cson/project'
 projectJson = path.resolve path.join __dirname, '../shared/json/project'
+projectBoth = path.resolve path.join __dirname, '../shared/both'
 
 envCson = path.resolve path.join __dirname, '../shared/cson/env'
 envJson = path.resolve path.join __dirname, '../shared/json/env'
@@ -16,6 +17,16 @@ envConfurgType = process.env['confurg_envtype']
 envConfurgEnv = process.env['confurg_env']
 
 confurgFile = path.resolve path.join __dirname, '../../src/confurg.coffee'
+
+dataTypes =
+  cson:
+    homePath: homeCson
+    projectPath: projectCson
+    envPath: envCson
+  json:
+    homePath: homeJson
+    projectPath: projectJson
+    envPath: envJson
 
 describe 'confurg', ->
   describe 'namespace', ->
@@ -31,15 +42,19 @@ describe 'confurg', ->
 
       expect(fn).to.not.throw()
 
-  dataTypes =
-    cson:
-      homePath: homeCson
-      projectPath: projectCson
-      envPath: envCson
-    json:
-      homePath: homeJson
-      projectPath: projectJson
-      envPath: envJson
+  it 'should retrieve config information from a custom CWD', ->
+    config = require(confurgFile).init({namespace: 'confurg', cwd: projectCson});
+    expect(config.projecttype).to.equal 'cson'
+    expect(config.project).to.equal 'default'
+    
+    config = require(confurgFile).init({namespace: 'confurg', cwd: projectJson});
+    expect(config.projecttype).to.equal 'json'
+    expect(config.project).to.equal 'default'
+
+  it 'should choose cson files over json files if they exist', ->
+    config = require(confurgFile).init({namespace: 'confurg', cwd: projectBoth});
+    expect(config.projecttype).to.equal 'cson'
+    expect(config.project).to.equal 'default'
 
   for own type, options of dataTypes
     do (type, options) ->
