@@ -7,69 +7,51 @@ fs = require 'fs'
 path = require 'path'
 # Reads coffeescript-json files
 cson = require 'cson'
-# Reads from commandline
-optimist = require("optimist").argv
 # Object extensions
 merge = require 'tea-merge'
 
-# Tries to find .cson and then .json files if the initial file does not exist
-_confurg = (file) ->
-	if typeof file is "string"
-		for f in [file, "#{file}.cson", "#{file}.json"]
-			if f? and fs.existsSync(f) and fs.statSync(f).isFile()
-				return cson.parseFileSync f
-
-	else if file?
-		return file
-
 confurg = module.exports =
 
-	init: (settings={}, defaults={}) ->
+	init: (config={}, defaults={}) ->
 
-		# Shorthand mode
-		settings = { namespace: settings } if typeof settings is "string"
+		# Shorthand mode, confurg.init("foo")
+		config = { namespace: config } if typeof config is "string"
 
-		throw "Need namespace config parameter" unless settings.namespace?.match /^\w+$/
+		throw "Need namespace config parameter" unless config.namespace?.match /^\w+$/
 
-		# default_settings =
+		# config
 		#	merge: true
 		#	deep: true
 
-		# Use custom CWD or parent's directory
-		cwd = settings?.cwd ? path.dirname(module.parent.filename)
+		config.cwd ?= path.dirname(module.parent.filename)
+		config.defaults ?= defaults
+		config.config ?= path.join(config.cwd, "config")
+		config.home ?= path.join(process.env.HOME, "."+config.namespace)
+		# Optimist reads from commandline
+		config.cli ?= require("optimist").argv
 
-		# Find env variables that match our namespace
-		re = new RegExp "^#{settings.namespace}_(\\w+)"
-		envs = {}
-		envs[matched] = val for key, val of process.env when matched = key.match(re)?[1]
+		unless config.env
+			# If env wasn't overriden, let's build it from ENV variables mathcing (namespace)_*
+			re = new RegExp "^#{config.namespace}_(\\w+)"
+			config.env = {}
+			config.env[matched] = val for key, val of process.env when matched = key.match(re)?[1]
 
 		merged = {}
 
-		# Locate configuration files
-		defaultConfigPath = "#{cwd}/config"
-		defaultHomePath = "#{process.env.HOME}/.#{settings.namespace}"	
-
-		# Confurg files and overrides
-		configConfurg = _confurg(settings?.config ? defaultConfigPath)
-		homeConfurg = _confurg(settings?.home ? defaultHomePath)
-		envConfurg = if settings?.env? then _confurg settings?.env else envs
-
-		# Various config locations together based on increasing precedence
-		merge(merged, c) for c in [
-			# Defaults
-			defaults
-
-			# ./config.cson
-			configConfurg
-
-			# ~/.project.cson
-			homeConfurg
-
-			# ENV variables
-			envConfurg
-
-			# Command line
-			optimist
-		] when typeof c is 'object'
+		# Let's glue all of the pieces together in a merged object.
+		for key in ['defaults', 'config', 'home', 'env', 'cli']
+			val = config[key]
+			switch typeof val
+				when 'string'
+					# If we end in .json or .cson, use that file, otherwise try both extensions.
+					for f in val.match(/\.[jc]son$/) && [val] or ["#{val}.cson", "#{val}.json"]
+						if fs.existsSync(f)
+							merge(merged, cson.parseFileSync f)
+							break
+				when 'object'
+					# If this is an object, the data has already been resolved to what we want, just merge.
+					merge(merged, val)
+				else
+					throw "Don't know what to do with content in #{key} (#{typeof val})"
 
 		merged

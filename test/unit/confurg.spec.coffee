@@ -63,8 +63,8 @@ describe 'confurg', ->
           beforeEach ->
             process.env.HOME = options.homePath
             module.filename = path.join options.projectPath, path.basename mfn
-            process.env['confurg_envtype'] = type
-            process.env['confurg_env'] = 'default'
+            process.env.confurg_envtype = type
+            process.env.confurg_env = 'default'
 
           afterEach ->
             process.env.HOME = home
@@ -73,14 +73,16 @@ describe 'confurg', ->
             process.env['confurg_env'] = envConfurgEnv
 
           it 'should load the config files', ->
+
             config = require(confurgFile).init 'confurg'
 
-            expect(config.hometype).to.equal type
-            expect(config.home).to.equal 'default'
-            expect(config.projecttype).to.equal type
-            expect(config.project).to.equal 'default'
-            expect(config.envtype).to.equal type
-            expect(config.env).to.equal 'default'
+            expect(config).to.be.an('object')
+            expect(config).to.have.property('hometype').and.equal(type)
+            expect(config).to.have.property('home').and.equal('default')
+            expect(config).to.have.property('projecttype').and.equal(type)
+            expect(config).to.have.property('project').and.equal('default')
+            expect(config).to.have.property('envtype').and.equal(type)
+            expect(config).to.have.property('env').and.equal('default')
 
           it 'should override the config files with new files that have extensions', ->
             config = require(confurgFile).init
