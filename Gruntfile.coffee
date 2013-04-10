@@ -11,6 +11,9 @@ exports = module.exports = (grunt) ->
       all: ['test/unit/*.spec.coffee']
     clean:
       src: ['docs']
+    docs:
+      all:
+        src: ['README.md', './src/confurg.coffee']
 
   grunt.loadNpmTasks 'grunt-mocha-cli'
   grunt.loadNpmTasks 'grunt-contrib-clean'
@@ -18,13 +21,13 @@ exports = module.exports = (grunt) ->
   grunt.registerTask 'test', ['mochacli']
 
   # Generate documentation
-  grunt.registerTask 'doc', 'Generate documentation', ->
+  grunt.registerMultiTask 'docs', 'Generate documentation', ->
     done = @async()
 
     child = grunt.util.spawn {
       cmd: './node_modules/.bin/docco'
       grunt: false
-      args: ['README.md', './src/confurg.coffee']
+      args: @filesSrc
     }, (error, result, code) ->
       grunt.log.ok 'Generated documentation at ./docs/'
       done()
@@ -32,4 +35,4 @@ exports = module.exports = (grunt) ->
     child.stdout.pipe process.stdout
     child.stderr.pipe process.stderr
 
-  grunt.registerTask 'docs', ['doc']
+  grunt.registerTask 'doc', ['docs']
