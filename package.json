@@ -2,7 +2,7 @@
   "name": "confurg",
   "description": "Coffeescript and Javascript configuration loader",
   "author": "Awnist <hi@awnist.com> (http://awnist.com)",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "main": "./lib/confurg",
   "repository": {
     "type": "git",

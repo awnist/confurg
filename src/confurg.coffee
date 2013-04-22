@@ -17,7 +17,7 @@ confurg = module.exports =
 		# Shorthand mode, confurg.init("foo")
 		config = { namespace: config } if typeof config is "string"
 
-		throw "Need namespace config parameter" unless config.namespace?.match /^\w+$/
+		throw "Need namespace config parameter" unless config.namespace?.match /^[\w\-\.]+$/
 
 		# config
 		#	merge: true
