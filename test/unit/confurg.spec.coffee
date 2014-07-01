@@ -74,7 +74,9 @@ describe 'confurg', ->
 
           it 'should load the config files', ->
 
-            config = require(confurgFile).init 'confurg'
+            config = require(confurgFile).init
+              namespace: 'confurg'
+              cwd: options.projectPath
 
             expect(config).to.be.an('object')
             expect(config).to.have.property('hometype').and.equal(type)
@@ -87,6 +89,7 @@ describe 'confurg', ->
           it 'should override the config files with new files that have extensions', ->
             config = require(confurgFile).init
               namespace: 'confurg'
+              cwd: options.homePath
               home: path.join options.homePath, "override.#{type}"
               config: path.join options.projectPath, "override.#{type}"
               env: path.join options.envPath, "override.#{type}"
@@ -101,6 +104,7 @@ describe 'confurg', ->
           it 'should override the config files with new files that do not extensions', ->
             config = require(confurgFile).init
               namespace: 'confurg'
+              cwd: options.homePath
               home: path.join options.homePath, 'override'
               config: path.join options.projectPath, 'override'
               env: path.join options.envPath, 'override'

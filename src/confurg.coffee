@@ -5,10 +5,11 @@
 
 fs = require 'fs'
 path = require 'path'
-# Reads coffeescript-json files
-cson = require 'cson'
+cson = require 'cson-safe'
 # Object extensions
 merge = require 'tea-merge'
+# Find topmost parent
+root = require 'root-finder'
 
 confurg = module.exports =
 
@@ -23,15 +24,16 @@ confurg = module.exports =
 		#	merge: true
 		#	deep: true
 
-		config.cwd ?= path.dirname(module.parent.filename)
+		config.cwd ?= root.path
+
 		config.defaults ?= defaults
 		config.config ?= path.join(config.cwd, "config")
 		config.home ?= path.join(process.env.HOME, "."+config.namespace)
 		# Optimist reads from commandline
-		config.cli ?= require("optimist").argv
+		config.cli ?= require("yargs").argv
 
 		unless config.env
-			# If env wasn't overriden, let's build it from ENV variables mathcing (namespace)_*
+			# If env wasn't overriden, let's build it from ENV variables matching (namespace)_*
 			re = new RegExp "^#{config.namespace}_(\\w+)"
 			config.env = {}
 			config.env[matched] = val for key, val of process.env when matched = key.match(re)?[1]
@@ -46,7 +48,7 @@ confurg = module.exports =
 					# If we end in .json or .cson, use that file, otherwise try both extensions.
 					for f in val.match(/\.[jc]son$/) && [val] or ["#{val}.cson", "#{val}.json"]
 						if fs.existsSync(f)
-							merge(merged, cson.parseFileSync f)
+							merge(merged, cson.parse fs.readFileSync f)
 							break
 				when 'object'
 					# If this is an object, the data has already been resolved to what we want, just merge.
