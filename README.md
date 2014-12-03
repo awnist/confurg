@@ -1,6 +1,6 @@
 ## What's "confurg"?
 
-confurg is a Coffeescript and Javascript module to load configuration files.
+confurg is a node.js configuration loader: supports chaining, command line options, ENV variables, and more.
 
 confurg is opinionated and has a clear order of precedence.
 
