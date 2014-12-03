@@ -9,7 +9,7 @@ cson = require 'cson-safe'
 # Object extensions
 merge = require 'tea-merge'
 # Find topmost parent
-root = require 'root-finder'
+root = require 'package.root'
 
 confurg = module.exports =
 
@@ -29,7 +29,7 @@ confurg = module.exports =
 		config.defaults ?= defaults
 		config.config ?= path.join(config.cwd, "config")
 		config.home ?= path.join(process.env.HOME, "."+config.namespace)
-		# Optimist reads from commandline
+		# Yargs reads from commandline
 		config.cli ?= require("yargs").argv
 
 		unless config.env
