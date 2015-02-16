@@ -2,7 +2,7 @@
   "name": "confurg",
   "description": "A node.js configuration loader: supports chaining, command line options, ENV variables, and more",
   "author": "Awnist <hi@awnist.com> (http://awnist.com)",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "main": "./lib/confurg",
   "repository": {
     "type": "git",
@@ -13,7 +13,8 @@
     "url": "http://unlicense.org/"
   },
   "dependencies": {
-    "cson-safe": "1.x",
+    "cson-parser": "^1.0.8",
+    "deep-set": "^1.0.1",
     "package.root": "^0.2.0",
     "tea-merge": "0.1.x",
     "yargs": "^1.3.3"

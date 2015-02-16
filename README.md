@@ -49,6 +49,25 @@ the result will be
     }
 ```
 
+## Regarding environment variables
+
+Most shells are very strict with variable names. [Bash only allows alphanumerics and underscores](http://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap08.html). Your project should be named appropriately (my_project instead of my-project) if this is an important factor.
+
+Additionally, to overwrite deeply nested config values, simply replace dots with a double underscore:
+
+```
+    $ export myproject_foo__bar__baz="value"
+```
+
+the above would overwrite the following:
+
+```
+    foo.bar.baz
+```
+
+in your config.
+
+
 ## Installation
 
 The recommended way is through [npm](http://www.npmjs.org/):

@@ -5,11 +5,12 @@
 
 fs = require 'fs'
 path = require 'path'
-cson = require 'cson-safe'
+cson = require 'cson-parser'
 # Object extensions
 merge = require 'tea-merge'
 # Find topmost parent
 root = require 'package.root'
+deepSet = require 'deep-set'
 
 confurg = module.exports =
 
@@ -34,9 +35,11 @@ confurg = module.exports =
 
 		unless config.env
 			# If env wasn't overriden, let's build it from ENV variables matching (namespace)_*
-			re = new RegExp "^#{config.namespace}_(\\w+)"
+			re = new RegExp "^#{config.namespace}_(.+)$"
 			config.env = {}
-			config.env[matched] = val for key, val of process.env when matched = key.match(re)?[1]
+
+			for key, val of process.env when matched = key.match(re)?[1]
+				deepSet config.env, matched.replace(/__(?!_)/g, '.'), val
 
 		merged = {}
 
